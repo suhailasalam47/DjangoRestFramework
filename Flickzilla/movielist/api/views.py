@@ -1,17 +1,36 @@
-from asyncio import streams
-from movielist.models import WatchList, StreamPlatform
-from .serializers import WatchListSerializer, StreamPlatformSerializer
+from movielist.models import WatchList, StreamPlatform, Reviews
+from .serializers import ReviewsSerializer, WatchListSerializer, StreamPlatformSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework import mixins, generics
+
+
+class ReviewDetails(mixins.RetrieveModelMixin, generics.GenericAPIView):
+    queryset = Reviews.objects.all()
+    serializer_class = ReviewsSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+        
+
+class ReviewList(mixins.CreateModelMixin, mixins.ListModelMixin, generics.GenericAPIView):
+    queryset = Reviews.objects.all()
+    serializer_class = ReviewsSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
 
 
 class WatchListAPI(APIView):
 
     def get(self, request):
         movies = WatchList.objects.all()
-        serializer = WatchListSerializer(movies, many=True)
+        serializer = WatchListSerializer(movies, many=True, context={'request': request})
         return Response(serializer.data)
 
     def post(self, request):
@@ -30,7 +49,7 @@ class WatchDetails(APIView):
             movie = WatchList.objects.get(pk=pk)
         except WatchList.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = WatchListSerializer(movie)
+        serializer = WatchListSerializer(movie,context={'request': request})
         return Response(serializer.data)
 
     def put(self, request, pk):
@@ -52,7 +71,7 @@ class StreamPlatformAPI(APIView):
 
     def get(self, request):
         stream = StreamPlatform.objects.all()
-        serializer = StreamPlatformSerializer(stream, many=True)
+        serializer = StreamPlatformSerializer(stream, many=True,context={'request': request})
         return Response(serializer.data)
 
     def post(self, request):
@@ -71,7 +90,7 @@ class StreamDetailAPI(APIView):
             stream = StreamPlatform.objects.get(pk=pk)
         except StreamPlatform.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = StreamPlatformSerializer(stream)
+        serializer = StreamPlatformSerializer(stream, context={'request': request})
         return Response(serializer.data)
 
     def put(self, request, pk):

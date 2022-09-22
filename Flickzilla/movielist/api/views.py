@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from movielist.models import WatchList, StreamPlatform, Reviews
 from .serializers import ReviewsSerializer, WatchListSerializer, StreamPlatformSerializer
+from .permissions import AdminOrReadOnly, ReviewUserOrReadOnly
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status, viewsets
@@ -37,7 +38,9 @@ class CreateReview(generics.CreateAPIView):
 class ReviewDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset = Reviews.objects.all()
     serializer_class = ReviewsSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [AdminOrReadOnly]
+    permission_classes = [ReviewUserOrReadOnly]
+
 
 
 # class ReviewDetails(mixins.RetrieveModelMixin, generics.GenericAPIView):
@@ -60,6 +63,7 @@ class ReviewDetails(generics.RetrieveUpdateDestroyAPIView):
 
 
 class WatchListAPI(APIView):
+    permission_classes=[AdminOrReadOnly]
 
     def get(self, request):
         movies = WatchList.objects.all()

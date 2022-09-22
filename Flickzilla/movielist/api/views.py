@@ -8,7 +8,7 @@ from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework import mixins, generics
 from rest_framework.validators import ValidationError
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 
 
 class ReviewList(generics.ListAPIView):
@@ -22,6 +22,7 @@ class ReviewList(generics.ListAPIView):
 class CreateReview(generics.CreateAPIView):
     serializer_class = ReviewsSerializer
     queryset = Reviews.objects.all()
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         pk = self.kwargs.get('pk')
@@ -31,6 +32,14 @@ class CreateReview(generics.CreateAPIView):
 
         if review.exists():
             raise ValidationError("You have already reviewed this movie!")
+
+        if movie.rating_count == 0:
+            movie.avg_rating = serializer.validated_data['review']
+        else:
+            movie.avg_rating = (movie.avg_rating + serializer.validated_data['review'])/2
+        
+        movie.rating_count = movie.rating_count+1
+        movie.save()
 
         serializer.save(watchlist=movie, user_name=user)
 

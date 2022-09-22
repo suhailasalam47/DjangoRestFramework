@@ -2,7 +2,9 @@ from dataclasses import fields
 from rest_framework import serializers
 from movielist.models import WatchList, StreamPlatform, Reviews
 
+
 class ReviewsSerializer(serializers.ModelSerializer):
+    user_name = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Reviews

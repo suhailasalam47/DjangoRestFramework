@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'movielist',
     'rest_framework.authtoken',
+    'accounts',
 ]
 
 MIDDLEWARE = [

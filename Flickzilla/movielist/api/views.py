@@ -13,6 +13,20 @@ from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from .throttling import ReviewListThrottle, CreateReviewThrottle
 
 
+class ReviewUser(generics.ListAPIView):
+    serializer_class = ReviewsSerializer
+    # permission_classes = [IsAuthenticated]
+    # throttle_classes = [ReviewListThrottle, AnonRateThrottle]
+
+    # def get_queryset(self):
+    #     name = self.kwargs['username']
+    #     return Reviews.objects.filter(user_name__username=name)
+
+    def get_queryset(self):
+        name = self.request.query_params.get('username', None)
+        return Reviews.objects.filter(user_name__username=name)
+
+
 class ReviewList(generics.ListAPIView):
     serializer_class = ReviewsSerializer
     # permission_classes = [IsAuthenticated]

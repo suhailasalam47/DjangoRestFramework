@@ -11,6 +11,8 @@ from rest_framework.validators import ValidationError
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from .throttling import ReviewListThrottle, CreateReviewThrottle
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 
 class ReviewUser(generics.ListAPIView):
@@ -30,7 +32,10 @@ class ReviewUser(generics.ListAPIView):
 class ReviewList(generics.ListAPIView):
     serializer_class = ReviewsSerializer
     # permission_classes = [IsAuthenticated]
-    throttle_classes = [ReviewListThrottle, AnonRateThrottle]
+    # throttle_classes = [ReviewListThrottle, AnonRateThrottle]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['user_name__username', 'review']
+
 
     def get_queryset(self):
         pk = self.kwargs['pk']
@@ -88,6 +93,12 @@ class ReviewDetails(generics.RetrieveUpdateDestroyAPIView):
 
 #     def post(self, request, *args, **kwargs):
 #         return self.create(request, *args, **kwargs)
+
+class MovieList(generics.ListAPIView):
+    queryset = WatchList.objects.all()
+    serializer_class = WatchListSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title', 'platform__name']
 
 
 class WatchListAPI(APIView):

@@ -10,12 +10,13 @@ from rest_framework import mixins, generics
 from rest_framework.validators import ValidationError
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
+from .throttling import ReviewListThrottle, CreateReviewThrottle
 
 
 class ReviewList(generics.ListAPIView):
     serializer_class = ReviewsSerializer
     # permission_classes = [IsAuthenticated]
-    throttle_classes = [AnonRateThrottle, UserRateThrottle]
+    throttle_classes = [ReviewListThrottle, AnonRateThrottle]
 
     def get_queryset(self):
         pk = self.kwargs['pk']
@@ -26,6 +27,7 @@ class CreateReview(generics.CreateAPIView):
     serializer_class = ReviewsSerializer
     queryset = Reviews.objects.all()
     permission_classes = [IsAuthenticated]
+    throttle_classes = [CreateReviewThrottle]
 
     def perform_create(self, serializer):
         pk = self.kwargs.get('pk')

@@ -13,7 +13,7 @@ from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from .throttling import ReviewListThrottle, CreateReviewThrottle
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
-from .pagination import PaginationMovie
+from .pagination import PaginationMovie, MovieLOPagination
 
 
 class ReviewUser(generics.ListAPIView):
@@ -100,7 +100,7 @@ class MovieList(generics.ListAPIView):
     serializer_class = WatchListSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['title', 'platform__name']
-    pagination_class = PaginationMovie
+    pagination_class = MovieLOPagination
 
 
 class WatchListAPI(APIView):

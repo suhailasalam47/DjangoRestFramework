@@ -1,4 +1,5 @@
 from dataclasses import fields
+from platform import platform
 from rest_framework import serializers
 from movielist.models import WatchList, StreamPlatform, Reviews
 
@@ -13,7 +14,8 @@ class ReviewsSerializer(serializers.ModelSerializer):
 
 
 class WatchListSerializer(serializers.HyperlinkedModelSerializer):
-    review = ReviewsSerializer(many=True, read_only=True)
+    # review = ReviewsSerializer(many=True, read_only=True)
+    platform = serializers.CharField(source='platform.name')
 
     class Meta:
         model = WatchList
